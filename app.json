@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "komkom-wheel",
-    "slug": "komkom-wheel",
-    "version": "1.0.0",
+    "name": "Afriquiya Wheel Of Fortune",
+    "slug": "komkom-afriquiya-wheel",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#007DBC"
     },
     "ios": {
       "supportsTablet": true
@@ -17,11 +17,17 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "backgroundColor": "#007DBC"
+      },
+      "package": "com.hhamza1.komkomafriquiyawheel"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "3ca4be90-9064-465a-92b3-82d189718262"
+      }
     }
   }
 }
