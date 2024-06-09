@@ -123,7 +123,5 @@ This project is licensed under the MIT License.
 
 ## Acknowledgements
 
-Special thanks to the development team and the client for their valuable feedback and support.
+Special thanks to the client for their valuable feedback and support.
 ```
-
-Feel free to copy the above markdown content into your `README.md` file.
