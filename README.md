@@ -114,6 +114,9 @@ To access the admin panel, use the following credentials:
 - **Username**: `admin`
 - **Password**: `password`
 
+These credentials can be changed in the `handleLogin` function in `App.js`.
+
+
 ## License
 
 This project is licensed under the MIT License.
