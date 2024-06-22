@@ -1,66 +1,67 @@
-import React, { useState, useRef } from 'react';
-import { StyleSheet, View, Text as RNText, TouchableOpacity, Modal, TextInput, Alert } from 'react-native';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
+import { StyleSheet, View, Text as RNText, TouchableOpacity, Modal, TextInput, Alert, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import ModalDropdown from 'react-native-modal-dropdown';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const icons = [
-  { icon: "futbol", name: "Ballon de foot" },
-  { icon: "first-aid", name: "Trousse de 1er secours" },
-  { icon: "wallet", name: "Porte monnaie" },
-  { icon: "trash", name: "Sac poubelle" },
-  { icon: "hand-paper", name: "Gants de protection" },
-  { icon: "vest", name: "Gilet doudoune" },
-  { icon: "hat-wizard", name: "Capuchon" },
-  { icon: "mobile-alt", name: "Support téléphone" },
-  { icon: "sun", name: "Cache soleil" },
-  { icon: "hat-cowboy", name: "Casquette" },
-  { icon: "key", name: "Porte clé" },
-  { icon: "bicycle", name: "Vélo" },
-  { icon: "book", name: "Livre" },
-  { icon: "camera", name: "Caméra" },
-  { icon: "car", name: "Voiture" },
-  { icon: "coffee", name: "Café" },
-  { icon: "gift", name: "Cadeau" },
-  { icon: "home", name: "Maison" },
-  { icon: "laptop", name: "Ordinateur portable" },
-  { icon: "music", name: "Musique" },
-  { icon: "phone", name: "Téléphone" },
-  { icon: "shopping-cart", name: "Panier" },
-  { icon: "suitcase", name: "Valise" },
-  { icon: "umbrella", name: "Parapluie" },
-  { icon: "user", name: "Utilisateur" },
-  { icon: "clock", name: "Montre" },
-  { icon: "gas-pump", name: "Carte carburant" },
-  { icon: "tshirt", name: "T-shirt" },
-  { icon: "shower", name: "Bon pour lavage" },
-  { icon: "ticket-alt", name: "Coupon de réduction" },
-  { icon: "map-marked-alt", name: "Carte routière" },
-  { icon: "headphones", name: "Écouteurs" },
-  { icon: "mug-hot", name: "Tasse" },
-  { icon: "thermometer-half", name: "Thermomètre" },
-  { icon: "snowflake", name: "Désodorisant" },
-  { icon: "medkit", name: "Kit de secours" },
-  { icon: "wrench", name: "Outil multifonction" },
-  { icon: "plug", name: "Chargeur voiture" },
-  { icon: "hands-helping", name: "Assistance routière" },
-  { icon: "shopping-bag", name: "Sac de courses" },
-  { icon: "wine-bottle", name: "Bouteille d'eau" },
-  { icon: "toilet-paper", name: "Rouleau de papier" },
-  { icon: "battery-full", name: "Batterie de secours" },
-  { icon: "globe", name: "Globe terrestre" },
-  { icon: "plane", name: "Billet d'avion" },
-  { icon: "bed", name: "Nuit d'hôtel" },
-  { icon: "cut", name: "Ciseaux" },
-  { icon: "pencil-alt", name: "Crayon" },
-  { icon: "leaf", name: "Produit écologique" },
-  { icon: "dog", name: "Accessoire pour chien" },
-  { icon: "battery-half", name: "Batterie" },
-  { icon: "road", name: "Route" },
-  { icon: "tachometer-alt", name: "Tachymètre" },
-  { icon: "toolbox", name: "Boîte à outils" },
-  { icon: "tint", name: "Teinture" },
-  { icon: "traffic-light", name: "Feu de circulation" }
-];
+    { icon: "futbol", name: "Ballon de foot" },
+    { icon: "first-aid", name: "Trousse de 1er secours" },
+    { icon: "wallet", name: "Porte monnaie" },
+    { icon: "trash", name: "Sac poubelle" },
+    { icon: "hand-paper", name: "Gants de protection" },
+    { icon: "vest", name: "Gilet doudoune" },
+    { icon: "hat-wizard", name: "Capuchon" },
+    { icon: "mobile-alt", name: "Support téléphone" },
+    { icon: "sun", name: "Cache soleil" },
+    { icon: "hat-cowboy", name: "Casquette" },
+    { icon: "key", name: "Porte clé" },
+    { icon: "bicycle", name: "Vélo" },
+    { icon: "book", name: "Livre" },
+    { icon: "camera", name: "Caméra" },
+    { icon: "car", name: "Voiture" },
+    { icon: "coffee", name: "Café" },
+    { icon: "gift", name: "Cadeau" },
+    { icon: "home", name: "Maison" },
+    { icon: "laptop", name: "Ordinateur portable" },
+    { icon: "music", name: "Musique" },
+    { icon: "phone", name: "Téléphone" },
+    { icon: "shopping-cart", name: "Panier" },
+    { icon: "suitcase", name: "Valise" },
+    { icon: "umbrella", name: "Parapluie" },
+    { icon: "user", name: "Utilisateur" },
+    { icon: "clock", name: "Montre" },
+    { icon: "gas-pump", name: "Carte carburant" },
+    { icon: "tshirt", name: "T-shirt" },
+    { icon: "shower", name: "Bon pour lavage" },
+    { icon: "ticket-alt", name: "Coupon de réduction" },
+    { icon: "map-marked-alt", name: "Carte routière" },
+    { icon: "headphones", name: "Écouteurs" },
+    { icon: "mug-hot", name: "Tasse" },
+    { icon: "thermometer-half", name: "Thermomètre" },
+    { icon: "snowflake", name: "Désodorisant" },
+    { icon: "medkit", name: "Kit de secours" },
+    { icon: "wrench", name: "Outil multifonction" },
+    { icon: "plug", name: "Chargeur voiture" },
+    { icon: "hands-helping", name: "Assistance routière" },
+    { icon: "shopping-bag", name: "Sac de courses" },
+    { icon: "wine-bottle", name: "Bouteille d'eau" },
+    { icon: "toilet-paper", name: "Rouleau de papier" },
+    { icon: "battery-full", name: "Batterie de secours" },
+    { icon: "globe", name: "Globe terrestre" },
+    { icon: "plane", name: "Billet d'avion" },
+    { icon: "bed", name: "Nuit d'hôtel" },
+    { icon: "cut", name: "Ciseaux" },
+    { icon: "pencil-alt", name: "Crayon" },
+    { icon: "leaf", name: "Produit écologique" },
+    { icon: "dog", name: "Accessoire pour chien" },
+    { icon: "battery-half", name: "Batterie" },
+    { icon: "road", name: "Route" },
+    { icon: "tachometer-alt", name: "Tachymètre" },
+    { icon: "toolbox", name: "Boîte à outils" },
+    { icon: "tint", name: "Teinture" },
+    { icon: "traffic-light", name: "Feu de circulation" }
+  ];
 
 const AdminPanel = ({ items, onAddItem, onEditItem, onDeleteItem, onClose }) => {
   const [selectedItem, setSelectedItem] = useState(null);
@@ -70,20 +71,20 @@ const AdminPanel = ({ items, onAddItem, onEditItem, onDeleteItem, onClose }) => 
   const logoRef = useRef('');
   const quantityRef = useRef(1);
 
-  const handleItemPress = (item) => {
+  const handleItemPress = useCallback((item) => {
     setSelectedItem(item);
     setIsEditing(false);
     setModalVisible(true);
-  };
+  }, []);
 
-  const handleEdit = () => {
+  const handleEdit = useCallback(() => {
     setIsEditing(true);
     nameRef.current = selectedItem.name;
     logoRef.current = selectedItem.logo;
     quantityRef.current = selectedItem.quantity;
-  };
+  }, [selectedItem]);
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = useCallback(async () => {
     const updatedItem = {
       name: nameRef.current,
       logo: logoRef.current,
@@ -91,10 +92,11 @@ const AdminPanel = ({ items, onAddItem, onEditItem, onDeleteItem, onClose }) => 
     };
     const index = items.findIndex(item => item.name === selectedItem.name);
     onEditItem(index, updatedItem);
+    await AsyncStorage.setItem('items', JSON.stringify(items));
     setModalVisible(false);
-  };
+  }, [items, onEditItem, selectedItem]);
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     Alert.alert(
       'Supprimer le cadeau',
       'Etes vous sur de vouloir supprimer ce cadeau?',
@@ -102,44 +104,46 @@ const AdminPanel = ({ items, onAddItem, onEditItem, onDeleteItem, onClose }) => 
         { text: 'Annuler', style: 'cancel' },
         {
           text: 'OK',
-          onPress: () => {
+          onPress: async () => {
             const index = items.findIndex(item => item.name === selectedItem.name);
             onDeleteItem(index);
+            await AsyncStorage.setItem('items', JSON.stringify(items));
             setModalVisible(false);
           },
         },
       ],
       { cancelable: false }
     );
-  };
+  }, [items, onDeleteItem, selectedItem]);
 
-  const handleAddNewItem = () => {
+  const handleAddNewItem = useCallback(() => {
     setSelectedItem(null);
     setIsEditing(true);
     nameRef.current = '';
     logoRef.current = '';
     quantityRef.current = 1;
     setModalVisible(true);
-  };
+  }, []);
 
-  const handleSaveNewItem = () => {
+  const handleSaveNewItem = useCallback(async () => {
     const newItem = {
       name: nameRef.current,
       logo: logoRef.current,
       quantity: parseInt(quantityRef.current, 10),
     };
     onAddItem(newItem);
+    await AsyncStorage.setItem('items', JSON.stringify(items));
     setModalVisible(false);
-  };
+  }, [items, onAddItem]);
 
-  const renderIconDropdownRow = (rowData) => (
+  const renderIconDropdownRow = useMemo(() => (rowData) => (
     <View style={styles.dropdownRow}>
       <Icon name={rowData.icon} size={20} style={styles.dropdownIcon} />
       <RNText>{rowData.name}</RNText>
     </View>
-  );
+  ), []);
 
-  const renderIconDropdown = () => (
+  const renderIconDropdown = useMemo(() => (
     <ModalDropdown
       options={icons}
       onSelect={(index, value) => logoRef.current = value.icon}
@@ -151,10 +155,10 @@ const AdminPanel = ({ items, onAddItem, onEditItem, onDeleteItem, onClose }) => 
       dropdownTextHighlightStyle={styles.dropdownTextHighlightStyle}
       renderButtonText={(rowData) => rowData.name} // Add this line to display the selected name
     />
-  );
+  ), [renderIconDropdownRow]);
 
   return (
-    <View style={styles.adminContainer}>
+    <ScrollView contentContainerStyle={styles.adminContainer}>
       <RNText style={styles.adminTitle}>Panneau de Configuration</RNText>
       <View style={styles.tableHeader}>
         <RNText style={styles.tableHeaderText}>Icone</RNText>
@@ -220,7 +224,7 @@ const AdminPanel = ({ items, onAddItem, onEditItem, onDeleteItem, onClose }) => 
           </View>
         </View>
       </Modal>
-    </View>
+    </ScrollView>
   );
 };
 

@@ -7,7 +7,8 @@ import {
   TextInput,
   Alert,
   Text as RNText,
-  ImageBackground
+  ImageBackground,
+  Dimensions
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -19,6 +20,8 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import { initialItems } from './data/initialItems';
 import clientLogo from './assets/images/client_logo.png';
 import ErrorBoundary from './ErrorBoundary';
+
+const { width, height } = Dimensions.get('window');
 
 export default function App() {
   const [items, setItems] = useState(initialItems);
@@ -231,23 +234,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#007DBC',
     alignItems: 'center',
     justifyContent: 'center',
+    padding: width * 0.05,
   },
   playButton: {
-    marginTop: 20,
+    marginTop: height * 0.02,
     backgroundColor: '#F48C1F',
-    padding: 20,
+    padding: width * 0.05,
     borderRadius: 10,
   },
   playButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 20,
+    fontSize: width * 0.05,
   },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: width * 0.05,
   },
   backgroundImage: {
     flex: 1,
@@ -260,42 +265,42 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: '80%',
-    padding: 20,
+    padding: width * 0.05,
     backgroundColor: '#fff',
     borderRadius: 10,
     alignItems: 'center',
     position: 'relative',
   },
   modalTitle: {
-    fontSize: 24,
+    fontSize: width * 0.06,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: height * 0.02,
     color: '#007DBC',
   },
   winnerText: {
-    fontSize: 24,
+    fontSize: width * 0.06,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: height * 0.01,
     color: '#005E8C',
     textAlign: 'center',
   },
   winnerName: {
-    fontSize: 28,
+    fontSize: width * 0.07,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: height * 0.02,
     color: '#005E8C',
     textAlign: 'center',
   },
   closeButton: {
-    marginTop: 20,
+    marginTop: height * 0.02,
     backgroundColor: '#E32E26',
-    padding: 10,
+    padding: width * 0.03,
     borderRadius: 5,
   },
   closeButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: width * 0.05,
   },
   closeButtonTop: {
     position: 'absolute',
@@ -304,19 +309,21 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '100%',
-    padding: 10,
-    marginBottom: 10,
+    padding: width * 0.03,
+    marginBottom: height * 0.01,
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 5,
+    fontSize: width * 0.04,
   },
   loginButton: {
-    fontSize: 18,
+    fontSize: width * 0.05,
     backgroundColor: '#007BFF',
     color: "#fff",
-    marginTop: 10,
-    padding: 10,
-    borderRadius: 10
+    marginTop: height * 0.02,
+    padding: width * 0.03,
+    borderRadius: 10,
+    textAlign: 'center',
   },
   lottie: {
     width: 500,
@@ -328,4 +335,4 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -20,
   },
-});
+})

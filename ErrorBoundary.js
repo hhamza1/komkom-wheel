@@ -1,5 +1,7 @@
 import React from 'react';
-import { Text as RNText, View, StyleSheet } from 'react-native';
+import { Text as RNText, View, StyleSheet, Dimensions } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -34,11 +36,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.5)',
+    padding: width * 0.05,
   },
   errorText: {
-    fontSize: 20,
+    fontSize: width * 0.05,
     color: '#fff',
+    textAlign: 'center',
   },
 });
 
-export default ErrorBoundary;
+export default ErrorBoundary

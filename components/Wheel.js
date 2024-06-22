@@ -127,7 +127,7 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
             setModalVisible(true);
             setEnabled(true);
           } else {
-            Alert.alert('Désolé, ce cadeau n\'est plus disponible.');
+            Alert.alert('Sorry, this item is out of stock.');
           }
         });
       });
@@ -210,7 +210,6 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
             height={60}
             x={-30}
             y={-30}
-            clipPath="url(#clip)"
             preserveAspectRatio="xMidYMid slice"
           />
         </G>
