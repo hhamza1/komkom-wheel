@@ -18,7 +18,6 @@
       "distribution": "internal"
     },
     "production": {
-      "owner": "hhamza1",
       "android": {
         "buildType": "apk",
         "image": "latest"
