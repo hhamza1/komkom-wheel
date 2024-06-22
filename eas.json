@@ -1,28 +1,28 @@
 {
-    "build": {
-      "preview": {
-        "android": {
-          "buildType": "apk",
-          "image" : "latest"
-        }
-      },
-      "preview2": {
-        "android": {
-          "gradleCommand": ":app:assembleRelease"
-        }
-      },
-      "preview3": {
-        "developmentClient": true
-      },
-      "preview4": {
-        "distribution": "internal"
-      },
-      "production": {
-        "android": {
-          "buildType": "apk",
-          "image" : "latest"
-        }
+  "build": {
+    "preview": {
+      "android": {
+        "buildType": "apk",
+        "image": "latest"
+      }
+    },
+    "preview2": {
+      "android": {
+        "gradleCommand": ":app:assembleRelease"
+      }
+    },
+    "preview3": {
+      "developmentClient": true
+    },
+    "preview4": {
+      "distribution": "internal"
+    },
+    "production": {
+      "owner": "hhamza1",
+      "android": {
+        "buildType": "apk",
+        "image": "latest"
       }
     }
   }
-  
+}
