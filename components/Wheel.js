@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { StyleSheet, View, Animated, Dimensions } from 'react-native';
+import { StyleSheet, View, Animated, Dimensions, Alert } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import Svg, { Path, G, Circle, Image as SvgImage } from 'react-native-svg';
 import * as d3Shape from 'd3-shape';
@@ -10,9 +10,9 @@ import randomColor from 'randomcolor';
 import { initialItems } from '../data/initialItems';
 import clientLogo from '../assets/images/client_logo.png';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('screen');
 const wheelSize = width * 0.95;
-const fontSize = width * 0.04; // Font size based on screen width
+const fontSize = 16;
 const oneTurn = 360;
 const angleBySegment = oneTurn / initialItems.length;
 const angleOffset = angleBySegment / 2;
@@ -32,7 +32,7 @@ const makeWheel = (items) => {
       .arc()
       .padAngle(0.01)
       .outerRadius(wheelSize / 2)
-      .innerRadius(30);
+      .innerRadius(30); // Adjusted to create a central circle
 
     return {
       path: instance(arc),
@@ -43,7 +43,7 @@ const makeWheel = (items) => {
   });
 };
 
-const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, setEnabled, logoClickCount, setLogoClickCount, setAdminModalVisible, setItems }, ref) => {
+const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, setEnabled, setItems }, ref) => {
   const _angle = useRef(new Animated.Value(0)).current;
   const angleRef = useRef(0);
   const wheelPaths = makeWheel(items);
@@ -91,7 +91,7 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
             setModalVisible(true);
             setEnabled(true);
           } else {
-            alert('Désolé, ce cadeau n\'est plus disponible.');
+            Alert.alert('Désolé, ce cadeau n\'est plus disponible.');
           }
         });
       });
@@ -127,7 +127,7 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
             setModalVisible(true);
             setEnabled(true);
           } else {
-            alert('Sorry, this item is out of stock.');
+            Alert.alert('Désolé, ce cadeau n\'est plus disponible.');
           }
         });
       });
@@ -135,7 +135,7 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
   }));
 
   const _renderKnob = () => {
-    const knobSize = width * 0.08; // Knob size based on screen width
+    const knobSize = 30;
     const YOLO = Animated.modulo(
       Animated.divide(
         Animated.modulo(Animated.subtract(_angle, angleOffset), oneTurn),
@@ -206,10 +206,10 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
           <Circle cx={0} cy={0} r={30} fill="none" />
           <SvgImage
             href={clientLogo}
-            width={wheelSize * 0.15}
-            height={wheelSize * 0.15}
-            x={-wheelSize * 0.075}
-            y={-wheelSize * 0.075}
+            width={60}
+            height={60}
+            x={-30}
+            y={-30}
             clipPath="url(#clip)"
             preserveAspectRatio="xMidYMid slice"
           />
@@ -252,7 +252,7 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
 const styles = StyleSheet.create({
   wheelContainer: {
     alignItems: 'center',
-    marginBottom: height * 0.02, // Adjust margin bottom based on screen height
+    marginBottom: 20,
   },
 });
 
