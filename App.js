@@ -8,10 +8,11 @@ import {
   Alert,
   Text as RNText,
   ImageBackground,
-  Dimensions
+  Platform
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import LottieView from 'lottie-react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';  // Import AsyncStorage
 import Wheel from './components/Wheel';
 import AdminPanel from './components/AdminPanel';
 import Header from './components/Header';
@@ -19,7 +20,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import { initialItems } from './data/initialItems';
 import clientLogo from './assets/images/client_logo.png';
 
-const { width, height } = Dimensions.get('window');
+const INVENTORY_KEY = 'inventory';
 
 export default function App() {
   const [items, setItems] = useState(initialItems);
@@ -33,6 +34,35 @@ export default function App() {
   const [enabled, setEnabled] = useState(true);
   const logoClickCountRef = useRef(0);
   const wheelRef = useRef(null);
+
+  useEffect(() => {
+    // Load the inventory from AsyncStorage when the app starts
+    const loadInventory = async () => {
+      try {
+        const savedItems = await AsyncStorage.getItem(INVENTORY_KEY);
+        if (savedItems !== null) {
+          setItems(JSON.parse(savedItems));
+        }
+      } catch (error) {
+        console.error('Failed to load inventory', error);
+      }
+    };
+
+    loadInventory();
+  }, []);
+
+  useEffect(() => {
+    // Save the inventory to AsyncStorage whenever it changes
+    const saveInventory = async () => {
+      try {
+        await AsyncStorage.setItem(INVENTORY_KEY, JSON.stringify(items));
+      } catch (error) {
+        console.error('Failed to save inventory', error);
+      }
+    };
+
+    saveInventory();
+  }, [items]);
 
   const handleLogin = () => {
     const username = usernameRef.current;
@@ -149,10 +179,8 @@ export default function App() {
                       style={styles.fireworks}
                     />
                     <RNText style={styles.winnerText}>Vous avez gagné:</RNText>
-                    <View style={styles.winnerContainer}>
-                      <Icon name={winner.logo} size={50} color="#005E8C" style={styles.winnerIcon} />
-                      <RNText style={styles.winnerName}>{winner.name}</RNText>
-                    </View>
+                    <Icon name={winner.logo} size={50} color="#005E8C" />
+                    <RNText style={styles.winnerName}>{winner.name}</RNText>
                   </>
                 )}
                 <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
@@ -200,25 +228,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#007DBC',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: width * 0.05,
   },
   playButton: {
-    marginTop: height * 0.02,
+    marginTop: 20,
     backgroundColor: '#F48C1F',
-    padding: width * 0.05,
+    padding: 20,
     borderRadius: 10,
   },
   playButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: width * 0.06,
+    fontSize: 20,
   },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    padding: width * 0.05,
   },
   backgroundImage: {
     flex: 1,
@@ -230,52 +256,43 @@ const styles = StyleSheet.create({
     opacity: 0.1,
   },
   modalContent: {
-    width: '100%',
-    maxWidth: 500,
-    padding: width * 0.05,
+    width: '80%',
+    padding: 20,
     backgroundColor: '#fff',
     borderRadius: 10,
     alignItems: 'center',
     position: 'relative',
   },
   modalTitle: {
-    fontSize: width * 0.06,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: height * 0.02,
+    marginBottom: 20,
     color: '#007DBC',
   },
   winnerText: {
-    fontSize: width * 0.06,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: height * 0.02,
+    marginBottom: 10,
     color: '#005E8C',
     textAlign: 'center',
   },
-  winnerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: height * 0.02,
-  },
-  winnerIcon: {
-    marginRight: width * 0.02,
-  },
   winnerName: {
-    fontSize: width * 0.06,
+    fontSize: 28,
     fontWeight: 'bold',
+    marginBottom: 20,
     color: '#005E8C',
     textAlign: 'center',
   },
   closeButton: {
-    marginTop: height * 0.02,
+    marginTop: 20,
     backgroundColor: '#E32E26',
-    padding: width * 0.03,
+    padding: 10,
     borderRadius: 5,
   },
   closeButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: width * 0.05,
+    fontSize: 16,
   },
   closeButtonTop: {
     position: 'absolute',
@@ -284,30 +301,28 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '100%',
-    padding: width * 0.03,
-    marginBottom: height * 0.01,
+    padding: 10,
+    marginBottom: 10,
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 5,
-    fontSize: width * 0.04,
   },
   loginButton: {
-    fontSize: width * 0.05,
+    fontSize: 18,
     backgroundColor: '#007BFF',
     color: "#fff",
-    marginTop: height * 0.02,
-    padding: width * 0.03,
-    borderRadius: 10,
-    textAlign: 'center',
+    marginTop: 10,
+    padding: 10,
+    borderRadius: 10
   },
   lottie: {
-    width: width * 0.8,
-    height: width * 0.8,
+    width: 500,
+    height: 500,
   },
   fireworks: {
-    width: width * 0.4,
-    height: width * 0.4,
+    width: 200,
+    height: 200,
     position: 'absolute',
-    top: -height * 0.1,
+    top: -20,
   },
-})
+});

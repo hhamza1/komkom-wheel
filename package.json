@@ -1,6 +1,6 @@
 {
   "name": "komkom-wheel",
-  "version": "1.0.0",
+  "version": "1.2.1",
   "main": "expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
@@ -11,6 +11,7 @@
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
     "@popmotion/popcorn": "^0.4.4",
+    "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/stack": "^6.3.29",
     "d3-shape": "^3.2.0",
