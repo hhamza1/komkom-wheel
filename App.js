@@ -7,20 +7,18 @@ import {
   TextInput,
   Alert,
   Text as RNText,
-  ImageBackground,
-  Platform
+  ImageBackground
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import LottieView from 'lottie-react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';  // Import AsyncStorage
 import Wheel from './components/Wheel';
 import AdminPanel from './components/AdminPanel';
 import Header from './components/Header';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { initialItems } from './data/initialItems';
 import clientLogo from './assets/images/client_logo.png';
-
-const INVENTORY_KEY = 'inventory';
+import ErrorBoundary from './ErrorBoundary';
 
 export default function App() {
   const [items, setItems] = useState(initialItems);
@@ -35,33 +33,36 @@ export default function App() {
   const logoClickCountRef = useRef(0);
   const wheelRef = useRef(null);
 
-  useEffect(() => {
-    // Load the inventory from AsyncStorage when the app starts
-    const loadInventory = async () => {
-      try {
-        const savedItems = await AsyncStorage.getItem(INVENTORY_KEY);
-        if (savedItems !== null) {
-          setItems(JSON.parse(savedItems));
-        }
-      } catch (error) {
-        console.error('Failed to load inventory', error);
-      }
-    };
+  const saveItems = async (items) => {
+    try {
+      await AsyncStorage.setItem('items', JSON.stringify(items));
+    } catch (error) {
+      console.error('Error saving items', error);
+    }
+  };
 
-    loadInventory();
+  const loadItems = async () => {
+    try {
+      const savedItems = await AsyncStorage.getItem('items');
+      if (savedItems) {
+        return JSON.parse(savedItems);
+      }
+    } catch (error) {
+      console.error('Error loading items', error);
+    }
+    return initialItems;
+  };
+
+  useEffect(() => {
+    const initializeItems = async () => {
+      const savedItems = await loadItems();
+      setItems(savedItems);
+    };
+    initializeItems();
   }, []);
 
   useEffect(() => {
-    // Save the inventory to AsyncStorage whenever it changes
-    const saveInventory = async () => {
-      try {
-        await AsyncStorage.setItem(INVENTORY_KEY, JSON.stringify(items));
-      } catch (error) {
-        console.error('Failed to save inventory', error);
-      }
-    };
-
-    saveInventory();
+    saveItems(items);
   }, [items]);
 
   const handleLogin = () => {
@@ -127,98 +128,100 @@ export default function App() {
   }, [modalVisible]);
 
   return (
-    <GestureHandlerRootView style={styles.container}>
-      <View style={styles.container}>
-        {adminScreenVisible ? (
-          <AdminPanel
-            items={items}
-            onAddItem={handleAddItem}
-            onEditItem={handleEditItem}
-            onDeleteItem={handleDeleteItem}
-            onClose={() => setAdminScreenVisible(false)}
-          />
-        ) : (
-          <>
-            <Header onLogoClick={handleLogoClick} />
-            <Wheel
-              ref={wheelRef}
+    <ErrorBoundary>
+      <GestureHandlerRootView style={styles.container}>
+        <View style={styles.container}>
+          {adminScreenVisible ? (
+            <AdminPanel
               items={items}
-              winner={winner}
-              setWinner={setWinner}
-              setModalVisible={setModalVisible}
-              enabled={enabled}
-              setEnabled={setEnabled}
-              setItems={setItems}
+              onAddItem={handleAddItem}
+              onEditItem={handleEditItem}
+              onDeleteItem={handleDeleteItem}
+              onClose={() => setAdminScreenVisible(false)}
             />
-            <TouchableOpacity
-              style={styles.playButton}
-              onPress={handlePlay}
-            >
-              <RNText style={styles.playButtonText}>Jouer</RNText>
-            </TouchableOpacity>
-          </>
-        )}
-        <Modal visible={modalVisible} transparent={true} animationType="slide">
-          <View style={styles.modalContainer}>
-            <ImageBackground source={clientLogo} style={styles.backgroundImage} imageStyle={styles.backgroundImageStyle}>
-              <View style={styles.modalContent}>
-                {!showWinner ? (
-                  <LottieView
-                    source={require('./assets/animations/box_opening.json')}
-                    autoPlay
-                    loop={false}
-                    style={styles.lottie}
-                    onAnimationFinish={() => setShowWinner(true)}
-                  />
-                ) : (
-                  <>
+          ) : (
+            <>
+              <Header onLogoClick={handleLogoClick} />
+              <Wheel
+                ref={wheelRef}
+                items={items}
+                winner={winner}
+                setWinner={setWinner}
+                setModalVisible={setModalVisible}
+                enabled={enabled}
+                setEnabled={setEnabled}
+                setItems={setItems}
+              />
+              <TouchableOpacity
+                style={styles.playButton}
+                onPress={handlePlay}
+              >
+                <RNText style={styles.playButtonText}>Jouer</RNText>
+              </TouchableOpacity>
+            </>
+          )}
+          <Modal visible={modalVisible} transparent={true} animationType="slide">
+            <View style={styles.modalContainer}>
+              <ImageBackground source={clientLogo} style={styles.backgroundImage} imageStyle={styles.backgroundImageStyle}>
+                <View style={styles.modalContent}>
+                  {!showWinner ? (
                     <LottieView
-                      source={require('./assets/animations/fireworks.json')}
+                      source={require('./assets/animations/box_opening.json')}
                       autoPlay
-                      loop={true}
-                      style={styles.fireworks}
+                      loop={false}
+                      style={styles.lottie}
+                      onAnimationFinish={() => setShowWinner(true)}
                     />
-                    <RNText style={styles.winnerText}>Vous avez gagné:</RNText>
-                    <Icon name={winner.logo} size={50} color="#005E8C" />
-                    <RNText style={styles.winnerName}>{winner.name}</RNText>
-                  </>
-                )}
-                <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
-                  <RNText style={styles.closeButtonText}>Fermer</RNText>
+                  ) : (
+                    <>
+                      <LottieView
+                        source={require('./assets/animations/fireworks.json')}
+                        autoPlay
+                        loop={true}
+                        style={styles.fireworks}
+                      />
+                      <RNText style={styles.winnerText}>Vous avez gagné:</RNText>
+                      <Icon name={winner.logo} size={50} color="#005E8C" />
+                      <RNText style={styles.winnerName}>{winner.name}</RNText>
+                    </>
+                  )}
+                  <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
+                    <RNText style={styles.closeButtonText}>Fermer</RNText>
+                  </TouchableOpacity>
+                </View>
+              </ImageBackground>
+            </View>
+          </Modal>
+          <Modal visible={adminModalVisible} transparent={true} animationType="slide">
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <TouchableOpacity
+                  style={styles.closeButtonTop}
+                  onPress={() => setAdminModalVisible(false)}
+                >
+                  <Icon name="times" size={20} color="#000" />
+                </TouchableOpacity>
+                <RNText style={styles.modalTitle}>Accès Admin</RNText>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Nom d'utilisateur"
+                  onChangeText={text => { usernameRef.current = text }}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Mot de passe"
+                  onChangeText={text => { passwordRef.current = text }}
+                  secureTextEntry={true}
+                />
+                <TouchableOpacity onPress={handleLogin}>
+                  <RNText style={styles.loginButton}>Se connecter</RNText>
                 </TouchableOpacity>
               </View>
-            </ImageBackground>
-          </View>
-        </Modal>
-        <Modal visible={adminModalVisible} transparent={true} animationType="slide">
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <TouchableOpacity
-                style={styles.closeButtonTop}
-                onPress={() => setAdminModalVisible(false)}
-              >
-                <Icon name="times" size={20} color="#000" />
-              </TouchableOpacity>
-              <RNText style={styles.modalTitle}>Accès Admin</RNText>
-              <TextInput
-                style={styles.input}
-                placeholder="Nom d'utilisateur"
-                onChangeText={text => { usernameRef.current = text }}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Mot de passe"
-                onChangeText={text => { passwordRef.current = text }}
-                secureTextEntry={true}
-              />
-              <TouchableOpacity onPress={handleLogin}>
-                <RNText style={styles.loginButton}>Se connecter</RNText>
-              </TouchableOpacity>
             </View>
-          </View>
-        </Modal>
-      </View>
-    </GestureHandlerRootView>
+          </Modal>
+        </View>
+      </GestureHandlerRootView>
+    </ErrorBoundary>
   );
 }
 
