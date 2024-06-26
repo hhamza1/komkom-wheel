@@ -15,7 +15,7 @@ import supportPhoneImage from '../assets/gifts/support-phone.png';
 
 const { width, height } = Dimensions.get('screen');
 const wheelSize = width * 0.95;
-const fontSize = width * 0.04;
+const fontSize = width * 0.05;
 const oneTurn = 360;
 const knobFill = randomColor({ hue: 'purple' });
 
