@@ -13,9 +13,9 @@ import gantsImage from '../assets/gifts/gants.png';
 import giletDoudouneImage from '../assets/gifts/gilet-doudoune.png';
 import supportPhoneImage from '../assets/gifts/support-phone.png';
 
-const { width } = Dimensions.get('screen');
+const { width, height } = Dimensions.get('screen');
 const wheelSize = width * 0.95;
-const fontSize = 16;
+const fontSize = width * 0.04;
 const oneTurn = 360;
 const knobFill = randomColor({ hue: 'purple' });
 
@@ -50,23 +50,22 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
   const wheelPaths = makeWheel(items);
   const numberOfSegments = wheelPaths.length;
   const angleBySegment = oneTurn / numberOfSegments;
-  const angleOffset = angleBySegment / 2;
   const [currentItem, setCurrentItem] = useState("");
 
   useEffect(() => {
     _angle.addListener(event => {
       angleRef.current = event.value;
-      const index = Math.floor((oneTurn - (angleRef.current % oneTurn) + angleOffset) % oneTurn / angleBySegment);
+      const index = Math.floor((oneTurn - (angleRef.current % oneTurn) + angleBySegment / 2) % oneTurn / angleBySegment);
       if (index >= 0 && index < numberOfSegments) {
         setCurrentItem(wheelPaths[index].value.name);
       }
     });
     return () => _angle.removeAllListeners();
-  }, [_angle, wheelPaths, angleBySegment, angleOffset, numberOfSegments]);
+  }, [_angle, wheelPaths, angleBySegment, numberOfSegments]);
 
   const _getWinnerIndex = () => {
     const deg = Math.abs(Math.round(angleRef.current % oneTurn));
-    const correctedDeg = (oneTurn - deg + angleOffset) % oneTurn;
+    const correctedDeg = (oneTurn - deg + angleBySegment / 2) % oneTurn;
     return Math.floor(correctedDeg / angleBySegment);
   };
 
@@ -89,7 +88,7 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
           const winnerIndex = _getWinnerIndex();
           if (winnerIndex === -1 || winnerIndex >= numberOfSegments) {
             console.error(`Invalid winner index: ${winnerIndex}`);
-            Alert.alert('Error', 'Invalid winner index.');
+            Alert.alert('Erreur', 'Indice de gagnant invalide.');
             setEnabled(true);
             return;
           }
@@ -132,7 +131,7 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
           const winnerIndex = _getWinnerIndex();
           if (winnerIndex === -1 || winnerIndex >= numberOfSegments) {
             console.error(`Invalid winner index: ${winnerIndex}`);
-            Alert.alert('Error', 'Invalid winner index.');
+            Alert.alert('Erreur', 'Indice de gagnant invalide.');
             setEnabled(true);
             return;
           }
@@ -158,10 +157,10 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
   }));
 
   const _renderKnob = () => {
-    const knobSize = 30;
+    const knobSize = width * 0.08;
     const YOLO = Animated.modulo(
       Animated.divide(
-        Animated.modulo(Animated.subtract(_angle, angleOffset), oneTurn),
+        Animated.modulo(Animated.subtract(_angle, angleBySegment / 2), oneTurn),
         new Animated.Value(angleBySegment)
       ),
       1
@@ -229,7 +228,7 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
               <G key={`arc-${i}`}>
                 <Path d={arc.path} fill={arc.color} stroke="white" strokeWidth={2} />
                 <G
-                  rotation={(i * oneTurn) / wheelPaths.length + angleOffset}
+                  rotation={(i * oneTurn) / wheelPaths.length + angleBySegment / 2}
                   origin={`${x}, ${y}`}
                 >
                   {image ? (
@@ -259,10 +258,10 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
           <Circle cx={0} cy={0} r={30} fill="none" />
           <SvgImage
             href={clientLogo}
-            width={60}
-            height={60}
-            x={-30}
-            y={-30}
+            width={wheelSize * 0.15}
+            height={wheelSize * 0.15}
+            x={-wheelSize * 0.075}
+            y={-wheelSize * 0.075}
             preserveAspectRatio="xMidYMid slice"
           />
         </G>
@@ -305,12 +304,12 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
 const styles = StyleSheet.create({
   wheelContainer: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: height * 0.02,
   },
   currentItemText: {
-    fontSize: 16,
+    fontSize: width * 0.04,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: height * 0.02,
     color: '#ffffff',
   },
 });

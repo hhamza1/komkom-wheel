@@ -8,7 +8,6 @@ import {
   Alert,
   Text as RNText,
   Image,
-  ImageBackground,
   Dimensions
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -20,7 +19,6 @@ import Header from './components/Header';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { initialItems } from './data/initialItems';
 import clientLogo from './assets/images/client_logo.png';
-import backgroundImage from './assets/images/background_image.png';
 import ErrorBoundary from './ErrorBoundary';
 import porteMonnaieImage from './assets/gifts/porte-monnaie.png';
 import sacPoubelleImage from './assets/gifts/sac-poubelle.png';
@@ -47,7 +45,7 @@ export default function App() {
     try {
       await AsyncStorage.setItem('items', JSON.stringify(items));
     } catch (error) {
-      console.error('Error saving items', error);
+      console.error('Erreur lors de la sauvegarde des articles', error);
     }
   };
 
@@ -58,7 +56,7 @@ export default function App() {
         return JSON.parse(savedItems);
       }
     } catch (error) {
-      console.error('Error loading items', error);
+      console.error('Erreur lors du chargement des articles', error);
     }
     return initialItems;
   };
@@ -132,7 +130,7 @@ export default function App() {
       setShowWinner(false);
       const timer = setTimeout(() => {
         setShowWinner(true);
-      }, 3000); // Adjust the delay as needed
+      }, 3000); // Ajuster le délai si nécessaire
       return () => clearTimeout(timer);
     }
   }, [modalVisible]);
@@ -206,7 +204,7 @@ export default function App() {
                       loop={true}
                       style={styles.fireworks}
                     />
-                    <RNText style={styles.winnerText}>FÉLICITATION VOUS AVEZ GAGNÉ</RNText>
+                    <RNText style={styles.winnerText}>FÉLICITATIONS, VOUS AVEZ GAGNÉ</RNText>
                     <View style={styles.winnerImageContainer}>
                       {renderWinnerImage(winner.logo) ? (
                         <Image source={renderWinnerImage(winner.logo)} style={styles.winnerImage} />
