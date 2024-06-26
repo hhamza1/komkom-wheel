@@ -1,12 +1,11 @@
-import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { StyleSheet, View, Animated, Dimensions, Alert } from 'react-native';
+import React, { useRef, useEffect, forwardRef, useImperativeHandle, useState } from 'react';
+import { StyleSheet, View, Animated, Dimensions, Alert, Text as RNText } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import Svg, { Path, G, Circle, Image as SvgImage } from 'react-native-svg';
 import * as d3Shape from 'd3-shape';
-import color from 'randomcolor';
+import randomColor from 'randomcolor';
 import { snap } from '@popmotion/popcorn';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import randomColor from 'randomcolor';
 import clientLogo from '../assets/images/client_logo.png';
 import porteMonnaieImage from '../assets/gifts/porte-monnaie.png';
 import sacPoubelleImage from '../assets/gifts/sac-poubelle.png';
@@ -18,7 +17,7 @@ const { width } = Dimensions.get('screen');
 const wheelSize = width * 0.95;
 const fontSize = 16;
 const oneTurn = 360;
-const knobFill = color({ hue: 'purple' });
+const knobFill = randomColor({ hue: 'purple' });
 
 const makeWheel = (items) => {
   const validItems = items.filter(item => item.quantity > 0);
@@ -34,7 +33,7 @@ const makeWheel = (items) => {
       .arc()
       .padAngle(0.01)
       .outerRadius(wheelSize / 2)
-      .innerRadius(30); // Adjusted to create a central circle
+      .innerRadius(30);
 
     return {
       path: instance(arc),
@@ -52,19 +51,23 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
   const numberOfSegments = wheelPaths.length;
   const angleBySegment = oneTurn / numberOfSegments;
   const angleOffset = angleBySegment / 2;
+  const [currentItem, setCurrentItem] = useState("");
 
   useEffect(() => {
     _angle.addListener(event => {
       angleRef.current = event.value;
+      const index = Math.floor((oneTurn - (angleRef.current % oneTurn) + angleOffset) % oneTurn / angleBySegment);
+      if (index >= 0 && index < numberOfSegments) {
+        setCurrentItem(wheelPaths[index].value.name);
+      }
     });
     return () => _angle.removeAllListeners();
-  }, [_angle]);
+  }, [_angle, wheelPaths, angleBySegment, angleOffset, numberOfSegments]);
 
   const _getWinnerIndex = () => {
     const deg = Math.abs(Math.round(angleRef.current % oneTurn));
     const correctedDeg = (oneTurn - deg + angleOffset) % oneTurn;
-    const winnerIndex = Math.floor(correctedDeg / angleBySegment);
-    return winnerIndex < numberOfSegments ? winnerIndex : winnerIndex % numberOfSegments;
+    return Math.floor(correctedDeg / angleBySegment);
   };
 
   const _onPan = ({ nativeEvent }) => {
@@ -77,14 +80,15 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
         useNativeDriver: true
       }).start(() => {
         _angle.setValue(angleRef.current % oneTurn);
-        const snapTo = snap(oneTurn / items.length);
+        const snapTo = snap(oneTurn / numberOfSegments);
         Animated.timing(_angle, {
           toValue: snapTo(angleRef.current),
           duration: 300,
           useNativeDriver: true
         }).start(() => {
           const winnerIndex = _getWinnerIndex();
-          if (winnerIndex < 0 || winnerIndex >= numberOfSegments) {
+          if (winnerIndex === -1 || winnerIndex >= numberOfSegments) {
+            console.error(`Invalid winner index: ${winnerIndex}`);
             Alert.alert('Error', 'Invalid winner index.');
             setEnabled(true);
             return;
@@ -103,6 +107,7 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
             setEnabled(true);
           } else {
             Alert.alert('Désolé, ce cadeau n\'est plus disponible.');
+            setEnabled(true);
           }
         });
       });
@@ -118,14 +123,15 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
         useNativeDriver: true
       }).start(() => {
         _angle.setValue(angleRef.current % oneTurn);
-        const snapTo = snap(oneTurn / items.length);
+        const snapTo = snap(oneTurn / numberOfSegments);
         Animated.timing(_angle, {
           toValue: snapTo(angleRef.current),
           duration: 300,
           useNativeDriver: true
         }).start(() => {
           const winnerIndex = _getWinnerIndex();
-          if (winnerIndex < 0 || winnerIndex >= numberOfSegments) {
+          if (winnerIndex === -1 || winnerIndex >= numberOfSegments) {
+            console.error(`Invalid winner index: ${winnerIndex}`);
             Alert.alert('Error', 'Invalid winner index.');
             setEnabled(true);
             return;
@@ -144,6 +150,7 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
             setEnabled(true);
           } else {
             Alert.alert('Désolé, ce cadeau n\'est plus disponible.');
+            setEnabled(true);
           }
         });
       });
@@ -265,6 +272,7 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
 
   return (
     <View style={styles.wheelContainer}>
+      <RNText style={styles.currentItemText}>{currentItem}</RNText>
       {_renderKnob()}
       <PanGestureHandler
         onGestureEvent={Animated.event(
@@ -298,6 +306,12 @@ const styles = StyleSheet.create({
   wheelContainer: {
     alignItems: 'center',
     marginBottom: 20,
+  },
+  currentItemText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#ffffff',
   },
 });
 
