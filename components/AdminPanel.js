@@ -1,67 +1,72 @@
-import React, { useState, useRef, useCallback, useMemo } from 'react';
-import { StyleSheet, View, Text as RNText, TouchableOpacity, Modal, TextInput, Alert, ScrollView } from 'react-native';
+import React, { useState, useRef, useCallback } from 'react';
+import { StyleSheet, View, Text as RNText, TouchableOpacity, Modal, TextInput, Alert, ScrollView, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import ModalDropdown from 'react-native-modal-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import porteMonnaieImage from '../assets/gifts/porte-monnaie.png';
+import sacPoubelleImage from '../assets/gifts/sac-poubelle.png';
+import gantsImage from '../assets/gifts/gants.png';
+import giletDoudouneImage from '../assets/gifts/gilet-doudoune.png';
+import supportPhoneImage from '../assets/gifts/support-phone.png';
 
 const icons = [
-    { icon: "futbol", name: "Ballon de foot" },
-    { icon: "first-aid", name: "Trousse de 1er secours" },
-    { icon: "wallet", name: "Porte monnaie" },
-    { icon: "trash", name: "Sac poubelle" },
-    { icon: "hand-paper", name: "Gants de protection" },
-    { icon: "vest", name: "Gilet doudoune" },
-    { icon: "hat-wizard", name: "Capuchon" },
-    { icon: "mobile-alt", name: "Support téléphone" },
-    { icon: "sun", name: "Cache soleil" },
-    { icon: "hat-cowboy", name: "Casquette" },
-    { icon: "key", name: "Porte clé" },
-    { icon: "bicycle", name: "Vélo" },
-    { icon: "book", name: "Livre" },
-    { icon: "camera", name: "Caméra" },
-    { icon: "car", name: "Voiture" },
-    { icon: "coffee", name: "Café" },
-    { icon: "gift", name: "Cadeau" },
-    { icon: "home", name: "Maison" },
-    { icon: "laptop", name: "Ordinateur portable" },
-    { icon: "music", name: "Musique" },
-    { icon: "phone", name: "Téléphone" },
-    { icon: "shopping-cart", name: "Panier" },
-    { icon: "suitcase", name: "Valise" },
-    { icon: "umbrella", name: "Parapluie" },
-    { icon: "user", name: "Utilisateur" },
-    { icon: "clock", name: "Montre" },
-    { icon: "gas-pump", name: "Carte carburant" },
-    { icon: "tshirt", name: "T-shirt" },
-    { icon: "shower", name: "Bon pour lavage" },
-    { icon: "ticket-alt", name: "Coupon de réduction" },
-    { icon: "map-marked-alt", name: "Carte routière" },
-    { icon: "headphones", name: "Écouteurs" },
-    { icon: "mug-hot", name: "Tasse" },
-    { icon: "thermometer-half", name: "Thermomètre" },
-    { icon: "snowflake", name: "Désodorisant" },
-    { icon: "medkit", name: "Kit de secours" },
-    { icon: "wrench", name: "Outil multifonction" },
-    { icon: "plug", name: "Chargeur voiture" },
-    { icon: "hands-helping", name: "Assistance routière" },
-    { icon: "shopping-bag", name: "Sac de courses" },
-    { icon: "wine-bottle", name: "Bouteille d'eau" },
-    { icon: "toilet-paper", name: "Rouleau de papier" },
-    { icon: "battery-full", name: "Batterie de secours" },
-    { icon: "globe", name: "Globe terrestre" },
-    { icon: "plane", name: "Billet d'avion" },
-    { icon: "bed", name: "Nuit d'hôtel" },
-    { icon: "cut", name: "Ciseaux" },
-    { icon: "pencil-alt", name: "Crayon" },
-    { icon: "leaf", name: "Produit écologique" },
-    { icon: "dog", name: "Accessoire pour chien" },
-    { icon: "battery-half", name: "Batterie" },
-    { icon: "road", name: "Route" },
-    { icon: "tachometer-alt", name: "Tachymètre" },
-    { icon: "toolbox", name: "Boîte à outils" },
-    { icon: "tint", name: "Teinture" },
-    { icon: "traffic-light", name: "Feu de circulation" }
-  ];
+  { icon: "futbol", name: "Ballon de foot" },
+  { icon: "first-aid", name: "Trousse de 1er secours" },
+  { icon: "wallet", name: "Porte monnaie" },
+  { icon: "trash", name: "Sac poubelle" },
+  { icon: "hand-paper", name: "Gants de protection" },
+  { icon: "vest", name: "Gilet doudoune" },
+  { icon: "hat-wizard", name: "Capuchon" },
+  { icon: "mobile-alt", name: "Support téléphone" },
+  { icon: "sun", name: "Cache soleil" },
+  { icon: "hat-cowboy", name: "Casquette" },
+  { icon: "key", name: "Porte clé" },
+  { icon: "bicycle", name: "Vélo" },
+  { icon: "book", name: "Livre" },
+  { icon: "camera", name: "Caméra" },
+  { icon: "car", name: "Voiture" },
+  { icon: "coffee", name: "Café" },
+  { icon: "gift", name: "Cadeau" },
+  { icon: "home", name: "Maison" },
+  { icon: "laptop", name: "Ordinateur portable" },
+  { icon: "music", name: "Musique" },
+  { icon: "phone", name: "Téléphone" },
+  { icon: "shopping-cart", name: "Panier" },
+  { icon: "suitcase", name: "Valise" },
+  { icon: "umbrella", name: "Parapluie" },
+  { icon: "user", name: "Utilisateur" },
+  { icon: "clock", name: "Montre" },
+  { icon: "gas-pump", name: "Carte carburant" },
+  { icon: "tshirt", name: "T-shirt" },
+  { icon: "shower", name: "Bon pour lavage" },
+  { icon: "ticket-alt", name: "Coupon de réduction" },
+  { icon: "map-marked-alt", name: "Carte routière" },
+  { icon: "headphones", name: "Écouteurs" },
+  { icon: "mug-hot", name: "Tasse" },
+  { icon: "thermometer-half", name: "Thermomètre" },
+  { icon: "snowflake", name: "Désodorisant" },
+  { icon: "medkit", name: "Kit de secours" },
+  { icon: "wrench", name: "Outil multifonction" },
+  { icon: "plug", name: "Chargeur voiture" },
+  { icon: "hands-helping", name: "Assistance routière" },
+  { icon: "shopping-bag", name: "Sac de courses" },
+  { icon: "wine-bottle", name: "Bouteille d'eau" },
+  { icon: "toilet-paper", name: "Rouleau de papier" },
+  { icon: "battery-full", name: "Batterie de secours" },
+  { icon: "globe", name: "Globe terrestre" },
+  { icon: "plane", name: "Billet d'avion" },
+  { icon: "bed", name: "Nuit d'hôtel" },
+  { icon: "cut", name: "Ciseaux" },
+  { icon: "pencil-alt", name: "Crayon" },
+  { icon: "leaf", name: "Produit écologique" },
+  { icon: "dog", name: "Accessoire pour chien" },
+  { icon: "battery-half", name: "Batterie" },
+  { icon: "road", name: "Route" },
+  { icon: "tachometer-alt", name: "Tachymètre" },
+  { icon: "toolbox", name: "Boîte à outils" },
+  { icon: "tint", name: "Teinture" },
+  { icon: "traffic-light", name: "Feu de circulation" }
+];
 
 const AdminPanel = ({ items, onAddItem, onEditItem, onDeleteItem, onClose }) => {
   const [selectedItem, setSelectedItem] = useState(null);
@@ -136,14 +141,14 @@ const AdminPanel = ({ items, onAddItem, onEditItem, onDeleteItem, onClose }) => 
     setModalVisible(false);
   }, [items, onAddItem]);
 
-  const renderIconDropdownRow = useMemo(() => (rowData) => (
+  const renderIconDropdownRow = (rowData) => (
     <View style={styles.dropdownRow}>
       <Icon name={rowData.icon} size={20} style={styles.dropdownIcon} />
       <RNText>{rowData.name}</RNText>
     </View>
-  ), []);
+  );
 
-  const renderIconDropdown = useMemo(() => (
+  const renderIconDropdown = () => (
     <ModalDropdown
       options={icons}
       onSelect={(index, value) => logoRef.current = value.icon}
@@ -153,9 +158,27 @@ const AdminPanel = ({ items, onAddItem, onEditItem, onDeleteItem, onClose }) => 
       textStyle={styles.dropdownText}
       dropdownTextStyle={styles.dropdownTextStyle}
       dropdownTextHighlightStyle={styles.dropdownTextHighlightStyle}
-      renderButtonText={(rowData) => rowData.name} // Add this line to display the selected name
+      renderButtonText={(rowData) => rowData.name}
+      initialScrollIndex={Math.max(0, icons.findIndex(icon => icon.icon === logoRef.current))}
     />
-  ), [renderIconDropdownRow]);
+  );
+
+  const renderItemIcon = (item) => {
+    switch (item.logo) {
+      case 'wallet':
+        return <Image source={porteMonnaieImage} style={styles.itemImage} />;
+      case 'trash':
+        return <Image source={sacPoubelleImage} style={styles.itemImage} />;
+      case 'hand-paper':
+        return <Image source={gantsImage} style={styles.itemImage} />;
+      case 'vest':
+        return <Image source={giletDoudouneImage} style={styles.itemImage} />;
+      case 'mobile-alt':
+        return <Image source={supportPhoneImage} style={styles.itemImage} />;
+      default:
+        return <Icon name={item.logo} size={20} />;
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.adminContainer}>
@@ -167,7 +190,7 @@ const AdminPanel = ({ items, onAddItem, onEditItem, onDeleteItem, onClose }) => 
       </View>
       {items.map((item, index) => (
         <TouchableOpacity key={index} onPress={() => handleItemPress(item)} style={styles.tableRow}>
-          <Icon name={item.logo} size={20} style={styles.tableCell} />
+          {renderItemIcon(item)}
           <RNText style={styles.tableCell}>{item.name}</RNText>
           <RNText style={styles.tableCell}>{item.quantity}</RNText>
         </TouchableOpacity>
@@ -231,7 +254,6 @@ const AdminPanel = ({ items, onAddItem, onEditItem, onDeleteItem, onClose }) => 
 const styles = StyleSheet.create({
   adminContainer: {
     width: '100%',
-    padding: 20,
     alignItems: 'center',
   },
   adminTitle: {
@@ -258,11 +280,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '100%',
     paddingVertical: 10,
+    paddingHorizontal: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc'
   },
   tableCell: {
     flex: 1,
+    paddingLeft: 50,
+    justifyContent : 'center',
+    textAlign: 'left'
   },
   addItemButton: {
     marginTop: 20,
@@ -399,6 +425,10 @@ const styles = StyleSheet.create({
   modalButtonText: {
     color: '#fff',
     textAlign: 'center',
+  },
+  itemImage: {
+    width: 20,
+    height: 20,
   },
 });
 

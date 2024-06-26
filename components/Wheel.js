@@ -7,15 +7,17 @@ import color from 'randomcolor';
 import { snap } from '@popmotion/popcorn';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import randomColor from 'randomcolor';
-import { initialItems } from '../data/initialItems';
 import clientLogo from '../assets/images/client_logo.png';
+import porteMonnaieImage from '../assets/gifts/porte-monnaie.png';
+import sacPoubelleImage from '../assets/gifts/sac-poubelle.png';
+import gantsImage from '../assets/gifts/gants.png';
+import giletDoudouneImage from '../assets/gifts/gilet-doudoune.png';
+import supportPhoneImage from '../assets/gifts/support-phone.png';
 
 const { width } = Dimensions.get('screen');
 const wheelSize = width * 0.95;
 const fontSize = 16;
 const oneTurn = 360;
-const angleBySegment = oneTurn / initialItems.length;
-const angleOffset = angleBySegment / 2;
 const knobFill = color({ hue: 'purple' });
 
 const makeWheel = (items) => {
@@ -47,6 +49,9 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
   const _angle = useRef(new Animated.Value(0)).current;
   const angleRef = useRef(0);
   const wheelPaths = makeWheel(items);
+  const numberOfSegments = wheelPaths.length;
+  const angleBySegment = oneTurn / numberOfSegments;
+  const angleOffset = angleBySegment / 2;
 
   useEffect(() => {
     _angle.addListener(event => {
@@ -58,7 +63,8 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
   const _getWinnerIndex = () => {
     const deg = Math.abs(Math.round(angleRef.current % oneTurn));
     const correctedDeg = (oneTurn - deg + angleOffset) % oneTurn;
-    return Math.floor(correctedDeg / angleBySegment);
+    const winnerIndex = Math.floor(correctedDeg / angleBySegment);
+    return winnerIndex < numberOfSegments ? winnerIndex : winnerIndex % numberOfSegments;
   };
 
   const _onPan = ({ nativeEvent }) => {
@@ -71,23 +77,28 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
         useNativeDriver: true
       }).start(() => {
         _angle.setValue(angleRef.current % oneTurn);
-        const snapTo = snap(oneTurn / initialItems.length);
+        const snapTo = snap(oneTurn / items.length);
         Animated.timing(_angle, {
           toValue: snapTo(angleRef.current),
           duration: 300,
           useNativeDriver: true
         }).start(() => {
           const winnerIndex = _getWinnerIndex();
+          if (winnerIndex < 0 || winnerIndex >= numberOfSegments) {
+            Alert.alert('Error', 'Invalid winner index.');
+            setEnabled(true);
+            return;
+          }
           const winnerItem = wheelPaths[winnerIndex].value;
           const itemIndex = items.findIndex(item => item.name === winnerItem.name);
 
-          if (items[itemIndex].quantity > 0) {
+          if (itemIndex !== -1 && items[itemIndex].quantity > 0) {
             setItems(prev => {
               const updatedItems = [...prev];
               updatedItems[itemIndex].quantity -= 1;
               return updatedItems;
             });
-            setWinner({ name: winnerItem.name, logo: winnerItem.logo });
+            setWinner({ name: winnerItem.name, logo: winnerItem.logo, image: winnerItem.image });
             setModalVisible(true);
             setEnabled(true);
           } else {
@@ -107,27 +118,32 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
         useNativeDriver: true
       }).start(() => {
         _angle.setValue(angleRef.current % oneTurn);
-        const snapTo = snap(oneTurn / initialItems.length);
+        const snapTo = snap(oneTurn / items.length);
         Animated.timing(_angle, {
           toValue: snapTo(angleRef.current),
           duration: 300,
           useNativeDriver: true
         }).start(() => {
           const winnerIndex = _getWinnerIndex();
+          if (winnerIndex < 0 || winnerIndex >= numberOfSegments) {
+            Alert.alert('Error', 'Invalid winner index.');
+            setEnabled(true);
+            return;
+          }
           const winnerItem = wheelPaths[winnerIndex].value;
           const itemIndex = items.findIndex(item => item.name === winnerItem.name);
 
-          if (items[itemIndex].quantity > 0) {
+          if (itemIndex !== -1 && items[itemIndex].quantity > 0) {
             setItems(prev => {
               const updatedItems = [...prev];
               updatedItems[itemIndex].quantity -= 1;
               return updatedItems;
             });
-            setWinner({ name: winnerItem.name, logo: winnerItem.logo });
+            setWinner({ name: winnerItem.name, logo: winnerItem.logo, image: winnerItem.image });
             setModalVisible(true);
             setEnabled(true);
           } else {
-            Alert.alert('Sorry, this item is out of stock.');
+            Alert.alert('Désolé, ce cadeau n\'est plus disponible.');
           }
         });
       });
@@ -182,6 +198,26 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
         <G y={wheelSize / 2} x={wheelSize / 2}>
           {wheelPaths.map((arc, i) => {
             const [x, y] = arc.centroid;
+            let image = null;
+            switch (arc.value.logo) {
+              case "wallet":
+                image = porteMonnaieImage;
+                break;
+              case "trash":
+                image = sacPoubelleImage;
+                break;
+              case "hand-paper":
+                image = gantsImage;
+                break;
+              case "vest":
+                image = giletDoudouneImage;
+                break;
+              case "mobile-alt":
+                image = supportPhoneImage;
+                break;
+              default:
+                image = null;
+            }
             return (
               <G key={`arc-${i}`}>
                 <Path d={arc.path} fill={arc.color} stroke="white" strokeWidth={2} />
@@ -189,16 +225,26 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
                   rotation={(i * oneTurn) / wheelPaths.length + angleOffset}
                   origin={`${x}, ${y}`}
                 >
-                  <Icon
-                    name={arc.value.logo}
-                    size={fontSize * 2}
-                    color="#fff"
-                    style={{
-                      position: 'absolute',
-                      left: x + (wheelSize / 2) - fontSize,
-                      top: y + (wheelSize / 2) - fontSize
-                    }}
-                  />
+                  {image ? (
+                    <SvgImage
+                      href={image}
+                      width={fontSize * 2}
+                      height={fontSize * 2}
+                      x={x - fontSize}
+                      y={y - fontSize}
+                    />
+                  ) : (
+                    <Icon
+                      name={arc.value.logo}
+                      size={fontSize * 2}
+                      color="#fff"
+                      style={{
+                        position: 'absolute',
+                        left: x + (wheelSize / 2) - fontSize,
+                        top: y + (wheelSize / 2) - fontSize
+                      }}
+                    />
+                  )}
                 </G>
               </G>
             );

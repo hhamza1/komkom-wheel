@@ -7,6 +7,7 @@ import {
   TextInput,
   Alert,
   Text as RNText,
+  Image,
   ImageBackground,
   Dimensions
 } from 'react-native';
@@ -19,13 +20,19 @@ import Header from './components/Header';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { initialItems } from './data/initialItems';
 import clientLogo from './assets/images/client_logo.png';
+import backgroundImage from './assets/images/background_image.png';
 import ErrorBoundary from './ErrorBoundary';
+import porteMonnaieImage from './assets/gifts/porte-monnaie.png';
+import sacPoubelleImage from './assets/gifts/sac-poubelle.png';
+import gantsImage from './assets/gifts/gants.png';
+import giletDoudouneImage from './assets/gifts/gilet-doudoune.png';
+import supportPhoneImage from './assets/gifts/support-phone.png';
 
 const { width, height } = Dimensions.get('window');
 
 export default function App() {
   const [items, setItems] = useState(initialItems);
-  const [winner, setWinner] = useState({ name: null, logo: null });
+  const [winner, setWinner] = useState({ name: null, logo: null, image: null });
   const [modalVisible, setModalVisible] = useState(false);
   const [adminModalVisible, setAdminModalVisible] = useState(false);
   const [adminScreenVisible, setAdminScreenVisible] = useState(false);
@@ -130,6 +137,23 @@ export default function App() {
     }
   }, [modalVisible]);
 
+  const renderWinnerImage = (logo) => {
+    switch (logo) {
+      case 'wallet':
+        return porteMonnaieImage;
+      case 'trash':
+        return sacPoubelleImage;
+      case 'hand-paper':
+        return gantsImage;
+      case 'vest':
+        return giletDoudouneImage;
+      case 'mobile-alt':
+        return supportPhoneImage;
+      default:
+        return null;
+    }
+  };
+
   return (
     <ErrorBoundary>
       <GestureHandlerRootView style={styles.container}>
@@ -165,34 +189,39 @@ export default function App() {
           )}
           <Modal visible={modalVisible} transparent={true} animationType="slide">
             <View style={styles.modalContainer}>
-              <ImageBackground source={clientLogo} style={styles.backgroundImage} imageStyle={styles.backgroundImageStyle}>
-                <View style={styles.modalContent}>
-                  {!showWinner ? (
+              <View style={styles.winnerModalContent}>
+                {!showWinner ? (
+                  <LottieView
+                    source={require('./assets/animations/box_opening.json')}
+                    autoPlay
+                    loop={false}
+                    style={styles.lottie}
+                    onAnimationFinish={() => setShowWinner(true)}
+                  />
+                ) : (
+                  <>
                     <LottieView
-                      source={require('./assets/animations/box_opening.json')}
+                      source={require('./assets/animations/fireworks.json')}
                       autoPlay
-                      loop={false}
-                      style={styles.lottie}
-                      onAnimationFinish={() => setShowWinner(true)}
+                      loop={true}
+                      style={styles.fireworks}
                     />
-                  ) : (
-                    <>
-                      <LottieView
-                        source={require('./assets/animations/fireworks.json')}
-                        autoPlay
-                        loop={true}
-                        style={styles.fireworks}
-                      />
-                      <RNText style={styles.winnerText}>Vous avez gagné:</RNText>
-                      <Icon name={winner.logo} size={50} color="#005E8C" />
-                      <RNText style={styles.winnerName}>{winner.name}</RNText>
-                    </>
-                  )}
-                  <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
-                    <RNText style={styles.closeButtonText}>Fermer</RNText>
-                  </TouchableOpacity>
-                </View>
-              </ImageBackground>
+                    <RNText style={styles.winnerText}>FÉLICITATION VOUS AVEZ GAGNÉ</RNText>
+                    <View style={styles.winnerImageContainer}>
+                      {renderWinnerImage(winner.logo) ? (
+                        <Image source={renderWinnerImage(winner.logo)} style={styles.winnerImage} />
+                      ) : (
+                        <Icon name={winner.logo} size={100} color="#005E8C" />
+                      )}
+                    </View>
+                    <RNText style={styles.winnerName}>{winner.name}</RNText>
+                    <Image source={clientLogo} style={styles.clientLogo} />
+                  </>
+                )}
+                <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
+                  <RNText style={styles.closeButtonText}>Fermer</RNText>
+                </TouchableOpacity>
+              </View>
             </View>
           </Modal>
           <Modal visible={adminModalVisible} transparent={true} animationType="slide">
@@ -254,14 +283,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     padding: width * 0.05,
   },
-  backgroundImage: {
-    flex: 1,
-    width: '100%',
-    justifyContent: 'center',
+  winnerModalContent: {
+    width: '80%',
+    padding: width * 0.05,
+    backgroundColor: '#4e8cbd',
+    borderRadius: 10,
     alignItems: 'center',
-  },
-  backgroundImageStyle: {
-    opacity: 0.1,
+    justifyContent: 'center',
+    position: 'relative',
   },
   modalContent: {
     width: '80%',
@@ -271,25 +300,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position: 'relative',
   },
-  modalTitle: {
-    fontSize: width * 0.06,
-    fontWeight: 'bold',
-    marginBottom: height * 0.02,
-    color: '#007DBC',
-  },
   winnerText: {
     fontSize: width * 0.06,
     fontWeight: 'bold',
-    marginBottom: height * 0.01,
-    color: '#005E8C',
+    marginBottom: height * 0.02,
+    color: '#fff',
     textAlign: 'center',
   },
-  winnerName: {
-    fontSize: width * 0.07,
-    fontWeight: 'bold',
+  winnerImageContainer: {
+    width: 150,
+    height: 150,
+    backgroundColor: '#fff',
+    borderRadius: 75,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: height * 0.02,
     marginBottom: height * 0.02,
-    color: '#005E8C',
-    textAlign: 'center',
+  },
+  winnerImage: {
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
+  },
+  clientLogo: {
+    width: 60,
+    height: 60,
+    resizeMode: 'contain',
+    marginTop: height * 0.02,
   },
   closeButton: {
     marginTop: height * 0.02,
@@ -335,4 +372,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -20,
   },
-})
+  winnerName: {
+    fontSize: width * 0.07,
+    fontWeight: 'bold',
+    marginBottom: height * 0.02,
+    color: '#fff',
+    textAlign: 'center',
+  },
+});
