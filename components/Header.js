@@ -7,9 +7,9 @@ const Header = ({ onLogoClick }) => {
   return (
     <View style={styles.headerContainer}>
       <TouchableOpacity onPress={onLogoClick}>
-        <Image style={styles.logo} source={require('../assets/images/client_logo.png')} />
+        <Image style={styles.logo} source={require('../assets/images/client_logo_moov.png')} />
       </TouchableOpacity>
-      <RNText style={styles.sloganText}>GAGNEZ AVEC AFRIQUIA</RNText>
+      <RNText style={styles.sloganText}>GAGNEZ AVEC MOOVE OIL</RNText>
       <RNText style={styles.sloganSubText}>Tentez votre chance et gagnez</RNText>
     </View>
   );
@@ -21,8 +21,8 @@ const styles = StyleSheet.create({
     marginBottom: height * 0.02, // Adjust margin bottom based on screen height
   },
   logo: {
-    width: width * 0.25, // 25% of screen width
-    height: width * 0.25, // 25% of screen width to maintain aspect ratio
+    width: width * 0.3, // 25% of screen width
+    height: width * 0.3, // 25% of screen width to maintain aspect ratio
     resizeMode: 'contain',
     marginBottom: height * 0.01, // Adjust margin bottom based on screen height
   },

@@ -18,13 +18,12 @@ import AdminPanel from './components/AdminPanel';
 import Header from './components/Header';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { initialItems } from './data/initialItems';
-import clientLogo from './assets/images/client_logo.png';
+import clientLogo from './assets/images/client_logo_moov.png';
 import ErrorBoundary from './ErrorBoundary';
-import porteMonnaieImage from './assets/gifts/porte-monnaie.png';
-import sacPoubelleImage from './assets/gifts/sac-poubelle.png';
-import gantsImage from './assets/gifts/gants.png';
-import giletDoudouneImage from './assets/gifts/gilet-doudoune.png';
-import supportPhoneImage from './assets/gifts/support-phone.png';
+import cahierMoovImage from './assets/gifts/cahier-moov.png';
+import briquetMoovImage from './assets/gifts/briquet-moov.png';
+import impermeableMoovImage from './assets/gifts/impermeable-moov.png';
+import casquetteMoovImage from './assets/gifts/casquette-moov.png';
 
 const { width, height } = Dimensions.get('window');
 
@@ -76,7 +75,7 @@ export default function App() {
   const handleLogin = () => {
     const username = usernameRef.current;
     const password = passwordRef.current;
-    if (username === 'admin' && password === 'password') {
+    if (username === 'admin' && password === 'passwordMoov24') {
       setAdminModalVisible(false);
       setAdminScreenVisible(true);
     } else {
@@ -137,16 +136,14 @@ export default function App() {
 
   const renderWinnerImage = (logo) => {
     switch (logo) {
-      case 'wallet':
-        return porteMonnaieImage;
-      case 'trash':
-        return sacPoubelleImage;
-      case 'hand-paper':
-        return gantsImage;
+      case 'hat-cowboy':
+        return casquetteMoovImage;
       case 'vest':
-        return giletDoudouneImage;
-      case 'mobile-alt':
-        return supportPhoneImage;
+        return impermeableMoovImage;
+      case 'notebook':
+        return cahierMoovImage;
+      case 'fire':
+        return briquetMoovImage;
       default:
         return null;
     }

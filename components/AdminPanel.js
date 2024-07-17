@@ -3,11 +3,10 @@ import { StyleSheet, View, Text as RNText, TouchableOpacity, Modal, TextInput, A
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import ModalDropdown from 'react-native-modal-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import porteMonnaieImage from '../assets/gifts/porte-monnaie.png';
-import sacPoubelleImage from '../assets/gifts/sac-poubelle.png';
-import gantsImage from '../assets/gifts/gants.png';
-import giletDoudouneImage from '../assets/gifts/gilet-doudoune.png';
-import supportPhoneImage from '../assets/gifts/support-phone.png';
+import cahierMoovImage from '../assets/gifts/cahier-moov.png';
+import briquetMoovImage from '../assets/gifts/briquet-moov.png';
+import impermeableMoovImage from '../assets/gifts/impermeable-moov.png';
+import casquetteMoovImage from '../assets/gifts/casquette-moov.png';
 
 const icons = [
   { icon: "futbol", name: "Ballon de foot" },
@@ -165,16 +164,14 @@ const AdminPanel = ({ items, onAddItem, onEditItem, onDeleteItem, onClose }) => 
 
   const renderItemIcon = (item) => {
     switch (item.logo) {
-      case 'wallet':
-        return <Image source={porteMonnaieImage} style={styles.itemImage} />;
-      case 'trash':
-        return <Image source={sacPoubelleImage} style={styles.itemImage} />;
-      case 'hand-paper':
-        return <Image source={gantsImage} style={styles.itemImage} />;
+      case 'hat-cowboy':
+        return <Image source={casquetteMoovImage} style={styles.itemImage} />;
       case 'vest':
-        return <Image source={giletDoudouneImage} style={styles.itemImage} />;
-      case 'mobile-alt':
-        return <Image source={supportPhoneImage} style={styles.itemImage} />;
+        return <Image source={impermeableMoovImage} style={styles.itemImage} />;
+      case 'fire':
+        return <Image source={briquetMoovImage} style={styles.itemImage} />;
+      case 'notebook':
+        return <Image source={cahierMoovImage} style={styles.itemImage} />;
       default:
         return <Icon name={item.logo} size={20} />;
     }

@@ -6,12 +6,11 @@ import * as d3Shape from 'd3-shape';
 import randomColor from 'randomcolor';
 import { snap } from '@popmotion/popcorn';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import clientLogo from '../assets/images/client_logo.png';
-import porteMonnaieImage from '../assets/gifts/porte-monnaie.png';
-import sacPoubelleImage from '../assets/gifts/sac-poubelle.png';
-import gantsImage from '../assets/gifts/gants.png';
-import giletDoudouneImage from '../assets/gifts/gilet-doudoune.png';
-import supportPhoneImage from '../assets/gifts/support-phone.png';
+import clientLogo from '../assets/images/client_logo_moov.png';
+import cahierMoovImage from '../assets/gifts/cahier-moov.png';
+import briquetMoovImage from '../assets/gifts/briquet-moov.png';
+import impermeableMoovImage from '../assets/gifts/impermeable-moov.png';
+import casquetteMoovImage from '../assets/gifts/casquette-moov.png';
 
 const { width, height } = Dimensions.get('screen');
 const wheelSize = width * 0.95;
@@ -206,20 +205,20 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
             const [x, y] = arc.centroid;
             let image = null;
             switch (arc.value.logo) {
-              case "wallet":
-                image = porteMonnaieImage;
+              case "vest":
+                image = impermeableMoovImage;
                 break;
-              case "trash":
-                image = sacPoubelleImage;
+              case "notebook":
+                image = cahierMoovImage;
                 break;
-              case "hand-paper":
-                image = gantsImage;
+              case "fire":
+                image = briquetMoovImage;
                 break;
               case "vest":
                 image = giletDoudouneImage;
                 break;
-              case "mobile-alt":
-                image = supportPhoneImage;
+              case "hat-cowboy":
+                image = casquetteMoovImage;
                 break;
               default:
                 image = null;
@@ -234,10 +233,10 @@ const Wheel = forwardRef(({ items, winner, setWinner, setModalVisible, enabled, 
                   {image ? (
                     <SvgImage
                       href={image}
-                      width={fontSize * 2}
-                      height={fontSize * 2}
-                      x={x - fontSize}
-                      y={y - fontSize}
+                      width={fontSize * 6}
+                      height={fontSize * 6}
+                      x={x - fontSize - 40}
+                      y={y - fontSize - 40}
                     />
                   ) : (
                     <Icon
